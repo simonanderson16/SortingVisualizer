@@ -1,0 +1,121 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    color: white;
+}
+
+body {
+    background-color: #2f4454;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.byline {
+    font-style: italic;
+    font-weight: 200;
+    opacity: 0.5;
+    margin-top: -10px;
+}
+
+button {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+    background-color: #da7b93;
+    border: 0px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #ee4570;
+}
+
+.selected {
+    background-color: white;
+    color: #22303b;
+}
+
+.unselected {
+    background-color: #da7b93;
+}
+
+
+.control-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: fit-content;
+}
+
+.section {
+    background-color: #22303b;
+    padding: 10px;
+    border-radius: 10px;
+    width: fit-content;
+    height: 100%;
+    min-height: 80px;
+    margin: 10px;
+}
+
+.slider-inputs {
+    display: flex;
+    /*background-color: #376e6f;*/
+    padding: 0 10px 0 10px;
+    border-radius: 10px;
+}
+
+input {
+    margin: 10px 0px 10px 10px;
+}
+
+.array-size-slider {
+    margin-right: 30px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+     appearance: none;
+     background: transparent;
+     cursor: pointer;
+     width: 10rem;
+ }
+ 
+ /* Removes default focus */
+ input[type="range"]:focus {
+   outline: none;
+ }
+ 
+ /***** Chrome, Safari, Opera and Edge Chromium styles *****/
+ /* slider track */
+ input[type="range"]::-webkit-slider-runnable-track {
+    background-color: #2f4454;
+    border-radius: 0.5rem;
+    height: 0.5rem;  
+ }
+ 
+ /* slider thumb */
+ input[type="range"]::-webkit-slider-thumb {
+   -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    margin-top: -12px; /* Centers thumb on the track */
+    border-radius: 5px;
+    /*custom styles*/
+    background-color: #da7b93;
+    height: 2rem;
+    width: 1rem;
+ }
+ 
+ input[type="range"]:focus::-webkit-slider-thumb {   
+   border: 1px solid white;
+   outline-offset: 0.05rem; 
+ }
+
+ .array-panel {
+    background-color: #22303b;
+    border-radius: 10px;
+    height: 60vh;
+    margin: 10px;
+}
