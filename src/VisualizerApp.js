@@ -5,12 +5,24 @@ import ControlPanel from "./ControlPanel";
 
 export default function VisualizerApp() {
 
+  const STILL = 0;
+  const COMPARING = 1;
+  const MOVING = 2;
+  const COMPLETED = 3;
+
+  class ArrayItem {
+    constructor(value, status) {
+      this.value = value;
+      this.status = status;
+    }
+  }
+
     const generateRandomArray = (n) => {
         const randomArray = [];
       
         for (let i = 0; i < n; i++) {
           const randomNumber = Math.floor(Math.random() * (500 - 20 + 1)) + 20;
-          randomArray.push(randomNumber);
+          randomArray.push(new ArrayItem(randomNumber, STILL));
         }
       
         return randomArray;
@@ -41,7 +53,7 @@ export default function VisualizerApp() {
 
     const handleRunButton = (event) => {
         if (selected === "insertion") {
-            setArray(insertionSort(array));
+            (insertionSort(array));
         } else if (selected === "quick") {
             setArray(quickSort(array));
         } else if (selected === "bubble") {
@@ -53,44 +65,63 @@ export default function VisualizerApp() {
         }
     }
 
+    const lookupColor = (status) => {
+        switch (status) {
+          case STILL:
+            return 'tan';
+          case COMPARING:
+            return '#7587d6';
+          case MOVING:
+            return '#da7b93';
+          case COMPLETED: 
+            return '#73be8c';
+          default: 
+            return 'tan';
+        }
+    }
+
+      // SORTING ALGORITHMS
+      //==================================================================================================================================
+
     function insertionSort(arr) {
         for (let i = 1; i < arr.length; i++) {
-          const key = arr[i];
+          const key = arr[i].value;
           let j = i - 1;
       
-          while (j >= 0 && arr[j] > key) {
-            arr[j + 1] = arr[j];
+          while (j >= 0 && arr[j].value > key) {
+            arr[j + 1]= arr[j];
             j--;
           }
       
-          arr[j + 1] = key;
+          arr[j + 1] = {value: key, MOVING}; // arr[j + 1] = key
         }
       
-        return arr.slice();
+        for (let item of arr) {
+          item.status = COMPLETED;
+        }
+        setArray(arr.slice());
       }
-    
 
-    // SORTING ALGORITHMS
-    //==================================================================================================================================
+      //==================================================================================================================================
     
     function quickSort(arr) {
         if (arr.length <= 1) {
           return arr;
         }
       
-        const pivot = arr[arr.length - 1];
+        const pivot = arr[arr.length - 1].value;
         const left = [];
         const right = [];
       
         for (let i = 0; i < arr.length - 1; i++) {
-          if (arr[i] < pivot) {
+          if (arr[i].value < pivot) {
             left.push(arr[i]);
           } else {
             right.push(arr[i]);
           }
         }
       
-        return [...quickSort(left), pivot, ...quickSort(right)];
+        return [...quickSort(left), new ArrayItem(pivot, STILL), ...quickSort(right)];
       }
     
       //==================================================================================================================================
@@ -100,7 +131,7 @@ export default function VisualizerApp() {
       
         for (let i = 0; i < n - 1; i++) {
           for (let j = 0; j < n - i - 1; j++) {
-            if (arr[j] > arr[j + 1]) {
+            if (arr[j].value > arr[j + 1].value) {
               // Swap elements
               const temp = arr[j];
               arr[j] = arr[j + 1];
@@ -121,7 +152,7 @@ export default function VisualizerApp() {
           let minIndex = i;
       
           for (let j = i + 1; j < n; j++) {
-            if (arr[j] < arr[minIndex]) {
+            if (arr[j].value < arr[minIndex].value) {
               minIndex = j;
             }
           }
@@ -160,7 +191,7 @@ export default function VisualizerApp() {
         let rightIndex = 0;
       
         while (leftIndex < leftArr.length && rightIndex < rightArr.length) {
-          if (leftArr[leftIndex] < rightArr[rightIndex]) {
+          if (leftArr[leftIndex].value < rightArr[rightIndex].value) {
             mergedArr.push(leftArr[leftIndex]);
             leftIndex++;
           } else {
@@ -229,7 +260,13 @@ export default function VisualizerApp() {
                 </div>
                 </div>
             </div>
-            <ArrayPanel array={array}/>
+            <div className="array-panel" id="array-panel">
+                <div className="bars">
+                    {array.map((item, index) => (
+                        <div key={index} style={{height:`${item.value}px`, backgroundColor:`${lookupColor(item.status)}`}} className="bar"></div>
+                    ))}
+                </div>
+            </div>
         </div>
         </>
     )
