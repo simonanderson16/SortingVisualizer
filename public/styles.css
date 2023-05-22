@@ -7,9 +7,15 @@
 body {
     background-color: #2f4454;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
 }
 
 .byline {
@@ -31,6 +37,8 @@ button {
 
 button:hover {
     background-color: #ee4570;
+    color: white;
+    transform: translateY(-3px);
 }
 
 .selected {
@@ -42,11 +50,10 @@ button:hover {
     background-color: #da7b93;
 }
 
-
 .control-panel {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: space-around;
     height: fit-content;
 }
 
@@ -116,6 +123,31 @@ input[type="range"] {
  .array-panel {
     background-color: #22303b;
     border-radius: 10px;
-    height: 60vh;
+    height: 550px;
     margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
+
+.bars {
+    display: flex;
+    height: 500px;
+    margin: 20px;
+    margin-bottom: -32px;
+}
+
+.bar {
+    background-color: tan;
+    width: 5px;
+    margin: 1px;
+    align-self: flex-end;
+}
+
+/* 
+starting color: tan
+completed color: #73be8c (green)
+comparing color: #7587d6 (blue)
+moving color: #da7b93 (pink)
+*/

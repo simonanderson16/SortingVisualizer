@@ -14,7 +14,6 @@ export default function ControlPanel() {
       }
 
     const [array, setArray] = useState(generateRandomArray(50));
-    console.log(array);
 
     const [arraySize, setArraySize] = useState(50);
     const [sortingSpeed, setSortingSpeed] = useState(50);
