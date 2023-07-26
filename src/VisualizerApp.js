@@ -28,7 +28,7 @@ export default function VisualizerApp() {
   };
 
   const [arraySize, setArraySize] = useState(100);
-  const [sortingSpeed, setSortingSpeed] = useState(50);
+  const [sortingSpeed, setSortingSpeed] = useState(495);
   const [selected, setSelected] = useState("insertion");
   const [array, setArray] = useState(generateRandomArray(arraySize));
 
