@@ -134,7 +134,6 @@ export default function VisualizerApp() {
       await quickSort(arr, low, partitionIndex - 1);
       await quickSort(arr, partitionIndex + 1, high);
     } else if (low === high) {
-      // Mark the single element as completed
       arr[low].status = COMPLETED;
       updateArray([...arr]);
       await sleep();
@@ -153,7 +152,6 @@ export default function VisualizerApp() {
         updateArray([...arr]);
         await sleep();
 
-        // Swap the elements
         [arr[i], arr[j]] = [arr[j], arr[i]];
 
         arr[i].status = MOVING;
@@ -163,10 +161,8 @@ export default function VisualizerApp() {
       }
     }
 
-    // Move the pivot element to its correct position
     [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
 
-    // Mark the sorted partition as completed
     for (let k = low; k <= high; k++) {
       if (k === i + 1) arr[k].status = COMPLETED;
       else arr[k].status = STILL;
@@ -180,23 +176,54 @@ export default function VisualizerApp() {
 
   //==================================================================================================================================
 
-  function bubbleSort(arr) {
-    const n = arr.length;
+  const bubbleSort = async () => {
+    const n = array.length;
+    const newArray = [...array];
 
     for (let i = 0; i < n - 1; i++) {
+      let swapped = false;
+
       for (let j = 0; j < n - i - 1; j++) {
-        if (arr[j].value > arr[j + 1].value) {
-          // Swap elements
-          const temp = arr[j];
-          arr[j] = arr[j + 1];
-          arr[j + 1] = temp;
+        newArray[j].status = COMPARING;
+        newArray[j + 1].status = COMPARING;
+        updateArray([...newArray]);
+        await sleep();
+
+        if (newArray[j].value > newArray[j + 1].value) {
+          newArray[j].status = MOVING;
+          newArray[j + 1].status = MOVING;
+          updateArray([...newArray]);
+          await sleep();
+
+          [newArray[j], newArray[j + 1]] = [newArray[j + 1], newArray[j]];
+          swapped = true;
+
+          newArray[j].status = STILL;
+          newArray[j + 1].status = STILL;
+          updateArray([...newArray]);
+          await sleep();
         }
+
+        newArray[j].status = STILL;
+        newArray[j + 1].status = STILL;
+        updateArray([...newArray]);
+        await sleep();
       }
+
+      if (!swapped) break;
+
+      for (let k = n - i - 1; k < n; k++) {
+        newArray[k].status = COMPLETED;
+      }
+
+      updateArray([...newArray]);
+      await sleep();
     }
 
-    setArray(arr.slice());
-  }
-
+    newArray.forEach((item) => (item.status = COMPLETED));
+    updateArray([...newArray]);
+    await sleep();
+  };
   //==================================================================================================================================
 
   function selectionSort(arr) {
