@@ -52,7 +52,6 @@ export default function VisualizerApp() {
     if (selected === "insertion") {
       insertionSort(array);
     } else if (selected === "quick") {
-      // Create a deep copy of the array to avoid modifying the original array
       const newArray = array.map((item) => ({ ...item }));
       quickSort(newArray, 0, newArray.length - 1);
     } else if (selected === "bubble") {
@@ -74,18 +73,15 @@ export default function VisualizerApp() {
       const totalMargins =
         (numberOfBars - 1) * (window.innerWidth < 768 ? 1 : 2); // 2px for each bar's margin
 
-      // Calculate the width of each bar to fit within 90% of the array panel's width, accounting for margins
       const calculatedBarWidth =
         (arrayPanelWidth * 0.95 - totalMargins) / numberOfBars;
 
       setBarWidth(calculatedBarWidth);
     };
 
-    // Update the bar width on initial rendering and whenever the window is resized
     updateBarWidth();
     window.addEventListener("resize", updateBarWidth);
 
-    // Clean up the event listener on component unmount
     return () => window.removeEventListener("resize", updateBarWidth);
   }, [array]);
 
@@ -342,7 +338,6 @@ export default function VisualizerApp() {
       rightIndex++;
     }
 
-    // Update the main array with the merged elements
     for (let i = 0; i < mergedArray.length; i++) {
       array[start + i] = mergedArray[i];
       array[start + i].status = MOVING;
@@ -350,7 +345,6 @@ export default function VisualizerApp() {
       await sleep();
     }
 
-    // Mark the merged elements as still (completed)
     for (let i = start; i <= end; i++) {
       array[i].status = STILL;
     }
@@ -360,7 +354,6 @@ export default function VisualizerApp() {
   const performMergeSort = async () => {
     await mergeSort(0, array.length - 1);
 
-    // Mark all elements as completed as the sorting is finished
     const completedArray = array.map((item) => ({
       ...item,
       status: COMPLETED,
