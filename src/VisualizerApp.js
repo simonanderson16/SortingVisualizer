@@ -226,28 +226,58 @@ export default function VisualizerApp() {
   };
   //==================================================================================================================================
 
-  function selectionSort(arr) {
-    const n = arr.length;
+  const selectionSort = async () => {
+    const n = array.length;
+    const newArray = [...array];
 
     for (let i = 0; i < n - 1; i++) {
       let minIndex = i;
 
       for (let j = i + 1; j < n; j++) {
-        if (arr[j].value < arr[minIndex].value) {
+        newArray[j].status = COMPARING;
+        updateArray([...newArray]);
+        await sleep();
+
+        if (newArray[j].value < newArray[minIndex].value) {
+          if (minIndex !== i) {
+            newArray[minIndex].status = STILL;
+          }
           minIndex = j;
+          newArray[j].status = MOVING; // set the basis for comparison as a different color to make it stand out
+          updateArray([...newArray]);
+          await sleep();
+        } else {
+          newArray[j].status = STILL;
+          updateArray([...newArray]);
+          await sleep();
         }
       }
 
-      // Swap elements
       if (minIndex !== i) {
-        const temp = arr[i];
-        arr[i] = arr[minIndex];
-        arr[minIndex] = temp;
+        newArray[i].status = MOVING;
+        newArray[minIndex].status = MOVING;
+        updateArray([...newArray]);
+        await sleep();
+
+        // Swap the elements
+        [newArray[i], newArray[minIndex]] = [newArray[minIndex], newArray[i]];
+
+        newArray[i].status = STILL;
+        newArray[minIndex].status = STILL;
+        updateArray([...newArray]);
+        await sleep();
       }
+
+      newArray[i].status = COMPLETED;
+      updateArray([...newArray]);
+      await sleep();
     }
 
-    setArray(arr.slice());
-  }
+    // Mark the last element as completed, as it is now in its correct position
+    newArray[n - 1].status = COMPLETED;
+    updateArray([...newArray]);
+    await sleep();
+  };
 
   //==================================================================================================================================
 
