@@ -16,16 +16,18 @@ body {
 .app-container {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .byline {
     font-style: italic;
     font-weight: 200;
     opacity: 0.5;
-    margin-top: -10px;
+    margin-top: 10px;
 }
 
-button {
+.control-button, .selected, .unselected {
     padding: 10px;
     margin: 10px;
     border-radius: 10px;
@@ -35,7 +37,7 @@ button {
     transition: all 0.3s ease;
 }
 
-button:hover {
+.control-button:hover, .selected:hover, .unselected:hover {
     background-color: #ee4570;
     color: white;
     transform: translateY(-3px);
@@ -54,17 +56,27 @@ button:hover {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
     height: fit-content;
+    margin-top: 15px;
 }
 
 .section {
     background-color: #22303b;
     padding: 10px;
     border-radius: 10px;
-    width: fit-content;
     height: 100%;
     min-height: 80px;
     margin: 10px;
+}
+
+.control-inputs {
+    background-color: #22303b;
+    padding: 10px;
+    min-height: 80px;
+    margin: 10px;
+    border-radius: 10px;
+
 }
 
 .slider-inputs {
@@ -119,6 +131,23 @@ input[type="range"] {
    border: 1px solid white;
    outline-offset: 0.05rem; 
  }
+
+ .run-button {
+    margin: 10px;
+    border-radius: 10px;
+    background-color: #f3a86f;
+    padding: 10px 20px 10px 20px;
+    border: 0px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+ }
+
+ .run-button:hover {
+    background-color: #fa8e3b;
+    color: white;
+    transform: translateY(-3px);
+ }
+ 
 
  .array-panel {
     background-color: #22303b;
