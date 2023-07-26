@@ -279,77 +279,68 @@ export default function VisualizerApp() {
 
   //==================================================================================================================================
 
-  const mergeSort = async (arr) => {
-    if (arr.length <= 1) {
-      return arr;
+  const mergeSort = async (start, end) => {
+    if (start >= end) {
+      return;
     }
 
-    const middle = Math.floor(arr.length / 2);
-    const left = arr.slice(0, middle);
-    const right = arr.slice(middle);
+    const middle = Math.floor((start + end) / 2);
 
-    const leftSorted = await mergeSort(left);
-    const rightSorted = await mergeSort(right);
+    await mergeSort(start, middle);
+    await mergeSort(middle + 1, end);
 
-    const mergedArray = await merge(leftSorted, rightSorted);
-    return mergedArray;
+    await merge(start, middle, end);
   };
 
-  const merge = async (leftArr, rightArr) => {
+  const merge = async (start, middle, end) => {
     const mergedArray = [];
-    let leftIndex = 0;
-    let rightIndex = 0;
+    let leftIndex = start;
+    let rightIndex = middle + 1;
 
-    while (leftIndex < leftArr.length && rightIndex < rightArr.length) {
-      leftArr[leftIndex].status = COMPARING;
-      rightArr[rightIndex].status = COMPARING;
-      updateArray([...array]);
-      await sleep();
-
-      if (leftArr[leftIndex].value < rightArr[rightIndex].value) {
-        mergedArray.push(leftArr[leftIndex]);
-        leftArr[leftIndex].status = MOVING;
-        updateArray([...array]);
-        await sleep();
-        leftArr[leftIndex].status = STILL;
+    while (leftIndex <= middle && rightIndex <= end) {
+      if (array[leftIndex].value < array[rightIndex].value) {
+        mergedArray.push(array[leftIndex]);
         leftIndex++;
       } else {
-        mergedArray.push(rightArr[rightIndex]);
-        rightArr[rightIndex].status = MOVING;
-        updateArray([...array]);
-        await sleep();
-        rightArr[rightIndex].status = STILL;
+        mergedArray.push(array[rightIndex]);
         rightIndex++;
       }
     }
 
-    while (leftIndex < leftArr.length) {
-      mergedArray.push(leftArr[leftIndex]);
-      leftArr[leftIndex].status = MOVING;
-      updateArray([...array]);
-      await sleep();
-      leftArr[leftIndex].status = STILL;
+    while (leftIndex <= middle) {
+      mergedArray.push(array[leftIndex]);
       leftIndex++;
     }
 
-    while (rightIndex < rightArr.length) {
-      mergedArray.push(rightArr[rightIndex]);
-      rightArr[rightIndex].status = MOVING;
-      updateArray([...array]);
-      await sleep();
-      rightArr[rightIndex].status = STILL;
+    while (rightIndex <= end) {
+      mergedArray.push(array[rightIndex]);
       rightIndex++;
     }
 
-    return mergedArray;
+    // Update the main array with the merged elements
+    for (let i = 0; i < mergedArray.length; i++) {
+      array[start + i] = mergedArray[i];
+      array[start + i].status = MOVING;
+      setArray([...array]);
+      await sleep();
+    }
+
+    // Mark the merged elements as still (completed)
+    for (let i = start; i <= end; i++) {
+      array[i].status = STILL;
+    }
+    setArray([...array]);
   };
 
   const performMergeSort = async () => {
-    const newArray = [...array];
-    const sortedArray = await mergeSort(newArray);
+    await mergeSort(0, array.length - 1);
 
-    sortedArray.forEach((item) => (item.status = COMPLETED));
-    updateArray([...sortedArray]);
+    // Mark all elements as completed as the sorting is finished
+    const completedArray = array.map((item) => ({
+      ...item,
+      status: COMPLETED,
+    }));
+    setArray(completedArray);
   };
 
   //=================================================================================================================
