@@ -64,6 +64,31 @@ export default function VisualizerApp() {
     }
   };
 
+  const [barWidth, setBarWidth] = useState(0);
+
+  useEffect(() => {
+    const updateBarWidth = () => {
+      const arrayPanel = document.getElementById("array-panel");
+      const arrayPanelWidth = arrayPanel.offsetWidth;
+      const numberOfBars = array.length;
+      const totalMargins =
+        (numberOfBars - 1) * (window.innerWidth < 768 ? 1 : 2); // 2px for each bar's margin
+
+      // Calculate the width of each bar to fit within 90% of the array panel's width, accounting for margins
+      const calculatedBarWidth =
+        (arrayPanelWidth * 0.95 - totalMargins) / numberOfBars;
+
+      setBarWidth(calculatedBarWidth);
+    };
+
+    // Update the bar width on initial rendering and whenever the window is resized
+    updateBarWidth();
+    window.addEventListener("resize", updateBarWidth);
+
+    // Clean up the event listener on component unmount
+    return () => window.removeEventListener("resize", updateBarWidth);
+  }, [array]);
+
   const lookupColor = (status) => {
     switch (status) {
       case STILL:
@@ -353,24 +378,28 @@ export default function VisualizerApp() {
         <div className="control-panel">
           <div className="section">
             <div className="slider-inputs">
-              <p>Array Size:</p>
-              <input
-                type="range"
-                className="array-size-slider"
-                min="50"
-                max="200"
-                value={arraySize}
-                onChange={handleArraySizeChange}
-              />
-              <p>Sorting Speed:</p>
-              <input
-                type="range"
-                className="sorting-speed-slider"
-                min="0"
-                max="495"
-                value={sortingSpeed}
-                onChange={handleSortingSpeedChange}
-              />
+              <div style={{ display: "flex" }}>
+                <p>Array Size:</p>
+                <input
+                  type="range"
+                  className="array-size-slider"
+                  min="50"
+                  max={window.innerWidth < 768 ? "100" : "200"}
+                  value={arraySize}
+                  onChange={handleArraySizeChange}
+                />
+              </div>
+              <div style={{ display: "flex" }}>
+                <p>Sorting Speed:</p>
+                <input
+                  type="range"
+                  className="sorting-speed-slider"
+                  min="0"
+                  max="495"
+                  value={sortingSpeed}
+                  onChange={handleSortingSpeedChange}
+                />
+              </div>
             </div>
           </div>
           <div className="section">
@@ -429,6 +458,9 @@ export default function VisualizerApp() {
                 key={index}
                 style={{
                   height: `${item.value}px`,
+                  width: `${barWidth}px`,
+                  marginLeft: `${window.innerWidth < 768 ? "0.5px" : "1px"}`,
+                  marginRight: `${window.innerWidth < 768 ? "0.5px" : "1px"}`,
                   backgroundColor: `${lookupColor(item.status)}`,
                 }}
                 className="bar"
