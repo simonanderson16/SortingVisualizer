@@ -52,7 +52,9 @@ export default function VisualizerApp() {
     if (selected === "insertion") {
       insertionSort(array);
     } else if (selected === "quick") {
-      setArray(quickSort(array));
+      // Create a deep copy of the array to avoid modifying the original array
+      const newArray = array.map((item) => ({ ...item }));
+      quickSort(newArray, 0, newArray.length - 1);
     } else if (selected === "bubble") {
       bubbleSort(array);
     } else if (selected === "selection") {
@@ -126,29 +128,55 @@ export default function VisualizerApp() {
 
   //==================================================================================================================================
 
-  function quickSort(arr) {
-    if (arr.length <= 1) {
-      return arr;
+  const quickSort = async (arr, low, high) => {
+    if (low < high) {
+      const partitionIndex = await partition(arr, low, high);
+      await quickSort(arr, low, partitionIndex - 1);
+      await quickSort(arr, partitionIndex + 1, high);
+    } else if (low === high) {
+      // Mark the single element as completed
+      arr[low].status = COMPLETED;
+      updateArray([...arr]);
+      await sleep();
     }
+  };
 
-    const pivot = arr[arr.length - 1].value;
-    const left = [];
-    const right = [];
+  const partition = async (arr, low, high) => {
+    const pivot = arr[high];
+    let i = low - 1;
 
-    for (let i = 0; i < arr.length - 1; i++) {
-      if (arr[i].value < pivot) {
-        left.push(arr[i]);
-      } else {
-        right.push(arr[i]);
+    for (let j = low; j < high; j++) {
+      if (arr[j].value <= pivot.value) {
+        i++;
+        arr[i].status = COMPARING;
+        arr[j].status = COMPARING;
+        updateArray([...arr]);
+        await sleep();
+
+        // Swap the elements
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+
+        arr[i].status = MOVING;
+        arr[j].status = MOVING;
+        updateArray([...arr]);
+        await sleep();
       }
     }
 
-    return [
-      ...quickSort(left),
-      new ArrayItem(pivot, STILL),
-      ...quickSort(right),
-    ];
-  }
+    // Move the pivot element to its correct position
+    [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+
+    // Mark the sorted partition as completed
+    for (let k = low; k <= high; k++) {
+      if (k === i + 1) arr[k].status = COMPLETED;
+      else arr[k].status = STILL;
+    }
+
+    updateArray([...arr]);
+    await sleep();
+
+    return i + 1;
+  };
 
   //==================================================================================================================================
 
