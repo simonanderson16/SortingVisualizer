@@ -11,6 +11,7 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
+  overflow-x: hidden;
 }
 
 .app-container {
@@ -151,6 +152,16 @@ input[type="range"]:focus::-webkit-slider-thumb {
   outline-offset: 0.05rem;
 }
 
+.reset-button {
+  margin: 10px;
+  border-radius: 10px;
+  background-color: #7c6ff3;
+  padding: 10px 20px 10px 20px;
+  border: 0px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
 .run-button {
   margin: 10px;
   border-radius: 10px;
@@ -159,6 +170,12 @@ input[type="range"]:focus::-webkit-slider-thumb {
   border: 0px;
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+.reset-button:hover {
+  background-color: #6757f7;
+  color: white;
+  transform: translateY(-3px);
 }
 
 .run-button:hover {

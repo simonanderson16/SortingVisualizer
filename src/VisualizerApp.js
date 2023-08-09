@@ -8,6 +8,7 @@ export default function VisualizerApp() {
   const COMPARING = 1;
   const MOVING = 2;
   const COMPLETED = 3;
+  const PARTITION = 4;
 
   class ArrayItem {
     constructor(value, status) {
@@ -31,6 +32,7 @@ export default function VisualizerApp() {
   const [sortingSpeed, setSortingSpeed] = useState(495);
   const [selected, setSelected] = useState("insertion");
   const [array, setArray] = useState(generateRandomArray(arraySize));
+  const [running, setRunning] = useState(false);
 
   const handleArraySizeChange = (event) => {
     setArraySize(event.target.value);
@@ -45,15 +47,18 @@ export default function VisualizerApp() {
   };
 
   const generateNewArray = (event) => {
+    if (running) return;
     setArray(generateRandomArray(arraySize));
   };
 
   const handleRunButton = (event) => {
+    if (running) return;
+    setRunning(true);
     if (selected === "insertion") {
       insertionSort(array);
     } else if (selected === "quick") {
       const newArray = array.map((item) => ({ ...item }));
-      quickSort(newArray, 0, newArray.length - 1);
+      performQuickSort();
     } else if (selected === "bubble") {
       bubbleSort(array);
     } else if (selected === "selection") {
@@ -61,6 +66,11 @@ export default function VisualizerApp() {
     } else if (selected === "merge") {
       performMergeSort();
     }
+  };
+
+  const handleResetButton = (event) => {
+    setRunning(false);
+    setArray(generateRandomArray(arraySize));
   };
 
   const [barWidth, setBarWidth] = useState(0);
@@ -71,7 +81,7 @@ export default function VisualizerApp() {
       const arrayPanelWidth = arrayPanel.offsetWidth;
       const numberOfBars = array.length;
       const totalMargins =
-        (numberOfBars - 1) * (window.innerWidth < 768 ? 1 : 2); // 2px for each bar's margin
+        (numberOfBars - 1) * (window.innerWidth < 768 ? 1 : 2);
 
       const calculatedBarWidth =
         (arrayPanelWidth * 0.95 - totalMargins) / numberOfBars;
@@ -95,6 +105,8 @@ export default function VisualizerApp() {
         return "#da7b93";
       case COMPLETED:
         return "#73be8c";
+      case PARTITION:
+        return "#1cdced";
       default:
         return "tan";
     }
@@ -130,8 +142,8 @@ export default function VisualizerApp() {
 
         [newArray[j], newArray[j - 1]] = [newArray[j - 1], newArray[j]];
 
-        newArray[j].status = COMPARING;
-        newArray[j - 1].status = COMPARING;
+        newArray[j].status = STILL;
+        newArray[j - 1].status = STILL;
         updateArray(newArray);
 
         await sleep();
@@ -139,12 +151,17 @@ export default function VisualizerApp() {
         j--;
       }
 
+      newArray.forEach((item, index) => {
+        if (index <= i) {
+          item.status = COMPLETED;
+        } else {
+          item.status = STILL;
+        }
+      });
+
       updateArray(newArray);
       await sleep();
     }
-
-    newArray.forEach((item) => (item.status = COMPLETED));
-    updateArray(newArray);
   };
 
   //==================================================================================================================================
@@ -154,6 +171,13 @@ export default function VisualizerApp() {
       const partitionIndex = await partition(arr, low, high);
       await quickSort(arr, low, partitionIndex - 1);
       await quickSort(arr, partitionIndex + 1, high);
+
+      // Mark the sorted section as completed
+      for (let i = low; i <= high; i++) {
+        arr[i].status = COMPLETED;
+      }
+      updateArray([...arr]);
+      await sleep();
     } else if (low === high) {
       arr[low].status = COMPLETED;
       updateArray([...arr]);
@@ -165,18 +189,34 @@ export default function VisualizerApp() {
     const pivot = arr[high];
     let i = low - 1;
 
+    arr[high].status = PARTITION;
+
+    for (let j = low; j < high; j++) {
+      arr[j].status = COMPARING;
+    }
+
+    updateArray([...arr]);
+    await sleep();
+
     for (let j = low; j < high; j++) {
       if (arr[j].value <= pivot.value) {
         i++;
-        arr[i].status = COMPARING;
-        arr[j].status = COMPARING;
+
+        arr[i].status = MOVING;
+        arr[j].status = MOVING;
+
         updateArray([...arr]);
         await sleep();
 
         [arr[i], arr[j]] = [arr[j], arr[i]];
 
-        arr[i].status = MOVING;
-        arr[j].status = MOVING;
+        arr[i].status = STILL;
+        arr[j].status = STILL;
+
+        updateArray([...arr]);
+        await sleep();
+      } else {
+        arr[j].status = STILL;
         updateArray([...arr]);
         await sleep();
       }
@@ -185,14 +225,31 @@ export default function VisualizerApp() {
     [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
 
     for (let k = low; k <= high; k++) {
-      if (k === i + 1) arr[k].status = COMPLETED;
-      else arr[k].status = STILL;
+      if (k !== i + 1) {
+        arr[k].status = STILL;
+      }
     }
+
+    // Mark the partitioned element as completed
+    arr[i + 1].status = COMPLETED;
 
     updateArray([...arr]);
     await sleep();
 
+    arr[high].status = STILL;
+
     return i + 1;
+  };
+
+  const performQuickSort = async () => {
+    const newArray = [...array];
+    await quickSort(newArray, 0, newArray.length - 1);
+
+    const completedArray = newArray.map((item) => ({
+      ...item,
+      status: COMPLETED,
+    }));
+    updateArray(completedArray);
   };
 
   //==================================================================================================================================
@@ -366,8 +423,6 @@ export default function VisualizerApp() {
   return (
     <>
       <div className="app-container">
-        {/*<h1 className="title">Sorting Algorithm Visualizer</h1>
-            <h4 className="byline">By: Simon Anderson</h4>*/}
         <div className="control-panel">
           <div className="section">
             <div className="slider-inputs">
@@ -399,31 +454,31 @@ export default function VisualizerApp() {
             <div className="algorithm-inputs">
               <button
                 className={selected === "insertion" ? "selected" : "unselected"}
-                onClick={() => setSelected("insertion")}
+                onClick={() => (running ? null : setSelected("insertion"))}
               >
                 Insertion Sort
               </button>
               <button
                 className={selected === "quick" ? "selected" : "unselected"}
-                onClick={() => setSelected("quick")}
+                onClick={() => (running ? null : setSelected("quick"))}
               >
                 Quick Sort
               </button>
               <button
                 className={selected === "bubble" ? "selected" : "unselected"}
-                onClick={() => setSelected("bubble")}
+                onClick={() => (running ? null : setSelected("bubble"))}
               >
                 Bubble Sort
               </button>
               <button
                 className={selected === "selection" ? "selected" : "unselected"}
-                onClick={() => setSelected("selection")}
+                onClick={() => (running ? null : setSelected("selection"))}
               >
                 Selection Sort
               </button>
               <button
                 className={selected === "merge" ? "selected" : "unselected"}
-                onClick={() => setSelected("merge")}
+                onClick={() => (running ? null : setSelected("merge"))}
               >
                 Merge Sort
               </button>
@@ -441,7 +496,7 @@ export default function VisualizerApp() {
             Generate New Array
           </button>
           <button className="run-button" onClick={handleRunButton}>
-            Run
+            {running ? "Reset" : "Run"}
           </button>
         </div>
         <div className="array-panel" id="array-panel">
