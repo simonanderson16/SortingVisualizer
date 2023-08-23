@@ -162,6 +162,7 @@ export default function VisualizerApp() {
       updateArray(newArray);
       await sleep();
     }
+    setRunning(false);
   };
 
   //==================================================================================================================================
@@ -250,6 +251,7 @@ export default function VisualizerApp() {
       status: COMPLETED,
     }));
     updateArray(completedArray);
+    setRunning(false);
   };
 
   //==================================================================================================================================
@@ -301,6 +303,7 @@ export default function VisualizerApp() {
     newArray.forEach((item) => (item.status = COMPLETED));
     updateArray([...newArray]);
     await sleep();
+    setRunning(false);
   };
   //==================================================================================================================================
 
@@ -353,6 +356,7 @@ export default function VisualizerApp() {
     newArray[n - 1].status = COMPLETED;
     updateArray([...newArray]);
     await sleep();
+    setRunning(false);
   };
 
   //==================================================================================================================================
@@ -416,6 +420,7 @@ export default function VisualizerApp() {
       status: COMPLETED,
     }));
     setArray(completedArray);
+    setRunning(false);
   };
 
   //=================================================================================================================
