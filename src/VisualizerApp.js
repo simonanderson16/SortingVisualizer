@@ -496,7 +496,8 @@ export default function VisualizerApp() {
             Generate New Array
           </button>
           <button className="run-button" onClick={handleRunButton}>
-            {running ? "Reset" : "Run"}
+            {/* {running ? "Reset" : "Run"} */}
+            Run
           </button>
         </div>
         <div className="array-panel" id="array-panel">
